@@ -1,9 +1,8 @@
 #include <ceng_goto/ceng_goto.h>
 
-
 Goto::Goto(){
   pose_sub=n_.subscribe<nav_msgs::Odometry>("odom",1,boost::bind(&Goto::poseCallback,this,_1));
-  vel_pub=n_.advertise<geometry_msgs::Twist>("cmd_vel_mux/input/navi",1);
+  vel_pub=n_.advertise<geometry_msgs::Twist>("cmd_vel_mux/input/teleop",1);
   dist_tol_=5.0;
 }
 
@@ -34,16 +33,15 @@ void Goto::goToPoint(double x, double y){
   }
   vel_command_.linear.x=0;
   vel_command_.angular.z=0;
+  vel_pub.publish(vel_command_);
 }
-
 
 int main(int argc,char** argv){
   ros::init(argc,argv,"goto_xy");
   Goto go;
 
-  go.goToPoint(int(argv[1]), int(argv[2]));
+  go.goToPoint(std::atof(argv[1]), std::atof(argv[2]));
   ros::spin();
-
 
   return 0;
 }
